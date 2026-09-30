@@ -1,10 +1,23 @@
 // the declarations for this class can be found at "StaticBuffer.h"
 #include "StaticBuffer.h"
+#include <cstdio>
 
 unsigned char StaticBuffer::blocks[BUFFER_CAPACITY][BLOCK_SIZE];
 struct BufferMetaInfo StaticBuffer::metainfo[BUFFER_CAPACITY];
+// declare the blockAllocMap array
+unsigned char StaticBuffer::blockAllocMap[DISK_BLOCKS];
 
 StaticBuffer::StaticBuffer() {
+    // copy blockAllocMap blocks from disk to buffer (using readblock() of disk)
+    // blocks 0 to 3
+    for(int i = 0, blockAllocMapSlot = 0; i < 4; i++){
+        unsigned char buffer[BLOCK_SIZE];
+        Disk::readBlock(buffer, i);
+        for(int slot = 0; slot < BLOCK_SIZE; slot++, blockAllocMapSlot++){
+            StaticBuffer::blockAllocMap[blockAllocMapSlot] = buffer[slot];
+        }
+    }
+    
     // initialise all blocks as free
     for (int bufferIndex = 0; bufferIndex < BUFFER_CAPACITY; bufferIndex++) {
         // set metainfo[bufferindex] with the following values
@@ -26,6 +39,16 @@ subsequent stages, we will implement the write-back functionality here.
 */
 // write back all modified blocks on system exit
 StaticBuffer::~StaticBuffer() {
+    // copy blockAllocMap blocks from buffer to disk(using writeblock() of disk)
+    for(int i = 0, blockAllocMapSlot = 0; i < 4; i++){
+        unsigned char buffer[BLOCK_SIZE];
+        for(int slot = 0; slot < BLOCK_SIZE; slot++, blockAllocMapSlot++){
+            buffer[slot] = StaticBuffer::blockAllocMap[blockAllocMapSlot];
+        }
+        Disk::writeBlock(buffer, i);
+    }
+
+
   /*iterate through all the buffer blocks,
     write back blocks with metainfo as free=false,dirty=true
     using Disk::writeBlock()
@@ -36,6 +59,7 @@ StaticBuffer::~StaticBuffer() {
        }
    }
 }
+
 
 int StaticBuffer::getFreeBuffer(int blockNum){
     // Check if blockNum is valid (non zero and less than DISK_BLOCKS)
@@ -76,6 +100,12 @@ int StaticBuffer::getFreeBuffer(int blockNum){
                 bufferNum = bufferIndex;
             }
         }
+
+        printf("[LRU] evict buffer=%d block=%d timestamp=%d\n",
+               bufferNum,
+               metainfo[bufferNum].blockNum,
+               metainfo[bufferNum].timeStamp);
+
         // if dirty, write back to disk
         if(metainfo[bufferNum].dirty) {
             Disk::writeBlock(blocks[bufferNum], metainfo[bufferNum].blockNum);
