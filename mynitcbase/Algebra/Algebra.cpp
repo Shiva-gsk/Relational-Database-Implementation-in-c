@@ -37,6 +37,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
   if (srcRelId == E_RELNOTOPEN) {
     return E_RELNOTOPEN;
   }
+  // printf("relId: %d\n", srcRelId);
 
   AttrCatEntry attrCatEntry;
   // get the attribute catalog entry for attr, using AttrCacheTable::getAttrcatEntry()
@@ -149,7 +150,7 @@ int Algebra::insert(char relName[ATTR_SIZE], int nAttrs, char record[][ATTR_SIZE
 
     // get the relation's rel-id using OpenRelTable::getRelId() method
     int relId = OpenRelTable::getRelId(relName);
-
+    
     // if relation is not open in open relation table, return E_RELNOTOPEN
     // (check if the value returned from getRelId function call = E_RELNOTOPEN)
     if (relId == E_RELNOTOPEN) {
