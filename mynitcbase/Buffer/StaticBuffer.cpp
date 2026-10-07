@@ -101,10 +101,10 @@ int StaticBuffer::getFreeBuffer(int blockNum){
             }
         }
 
-        printf("[LRU] evict buffer=%d block=%d timestamp=%d\n",
-               bufferNum,
-               metainfo[bufferNum].blockNum,
-               metainfo[bufferNum].timeStamp);
+        // printf("[LRU] evict buffer=%d block=%d timestamp=%d\n",
+            //    bufferNum,
+            //    metainfo[bufferNum].blockNum,
+            //    metainfo[bufferNum].timeStamp);
 
         // if dirty, write back to disk
         if(metainfo[bufferNum].dirty) {

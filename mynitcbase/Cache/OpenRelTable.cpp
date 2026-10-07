@@ -424,13 +424,13 @@ int OpenRelTable::openRel(char relName[ATTR_SIZE]) {
     // relName as the input.
     tableMetaInfo[relId].free = false;
     strcpy(tableMetaInfo[relId].relName, relName);
-    // print all relations currently opened
-    std::cout << "Currently opened relations:\n";
-    for (int i = 0; i < MAX_OPEN; i++) {
-        if (OpenRelTable::tableMetaInfo[i].free == 0) {
-        std::cout << "  Relation ID: " << i << ", Name: " << OpenRelTable::tableMetaInfo[i].relName << "\n";
-        }
-    }
+    // // print all relations currently opened
+    // std::cout << "Currently opened relations:\n";
+    // for (int i = 0; i < MAX_OPEN; i++) {
+    //     if (OpenRelTable::tableMetaInfo[i].free == 0) {
+    //     std::cout << "  Relation ID: " << i << ", Name: " << OpenRelTable::tableMetaInfo[i].relName << "\n";
+    //     }
+    // }
     
     return relId;
 }
