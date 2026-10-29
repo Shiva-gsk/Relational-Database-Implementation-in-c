@@ -237,4 +237,4 @@ int AttrCacheTable::setAttrCatEntry(int relId, int attrOffset, AttrCatEntry *att
         }
     }
     return E_ATTRNOTEXIST;
-}z
+}
