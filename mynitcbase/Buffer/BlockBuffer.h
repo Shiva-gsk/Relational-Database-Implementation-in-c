@@ -24,6 +24,9 @@ typedef union Attribute {
 } Attribute;
 
 int compareAttrs(Attribute attr1, Attribute attr2, int attrType);
+void resetComparisonCounter();
+void incrementComparisonCounter();
+long long getComparisonCounter();
 
 struct InternalEntry {
   int32_t lChild;

@@ -1,6 +1,8 @@
 #include "Algebra.h"
 #include <iostream>
 #include <cstring>
+#include "../Buffer/BlockBuffer.h"
+#include <time.h>
 
 // will return if a string can be parsed as a floating point number
 bool isNumber(char *str) {
@@ -33,7 +35,9 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
     if (srcRelId == E_RELNOTOPEN) {
         return E_RELNOTOPEN;
     }
-
+    struct timespec start, end;
+     double elapsed_time;
+    clock_gettime(CLOCK_MONOTONIC, &start);
     AttrCatEntry attrCatEntry;
     // get the attribute catalog entry for attr, using AttrCacheTable::getAttrcatEntry()
     //    return E_ATTRNOTEXIST if it returns the error
@@ -57,6 +61,9 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
     }
 
     /*** Selecting records from the source relation ***/
+
+    // reset predicate comparison counter for this SELECT command
+    resetComparisonCounter();
 
     // Before calling the search function, reset the search to start from the first hit
     // using RelCacheTable::resetSearchIndex()
@@ -112,7 +119,18 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
                     break;
                 }
             }
-            
+       // 2. Get end time
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    // 3. Calculate difference in seconds (including fractions)
+    // tv_sec = whole seconds, tv_nsec = nanoseconds (1 billionth of a second)
+    elapsed_time = (end.tv_sec - start.tv_sec) + 
+                   (end.tv_nsec - start.tv_nsec) / 1000000000.0;
+
+    // %.6f prints the time up to 6 decimal places (microseconds)
+    printf("Elapsed time: %.6f seconds\n", elapsed_time);
+
+            std::cout << "Comparisons: " << getComparisonCounter() << std::endl;
             return SUCCESS;
         }
     else {
@@ -177,7 +195,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
             first record.
         */
         RelCacheTable::resetSearchIndex(srcRelId);
-        // AttrCacheTable::resetSearchIndex(srcRelId, attr);
+        AttrCacheTable::resetSearchIndex(srcRelId, attr);
 
         // read every record that satisfies the condition by repeatedly calling
         // BlockAccess::search() until there are no more records to be read
@@ -201,6 +219,20 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
 
         // Close the targetRel by calling closeRel() method of schema layer
         Schema::closeRel(targetRel);
+
+         // 2. Get end time
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    // 3. Calculate difference in seconds (including fractions)
+    // tv_sec = whole seconds, tv_nsec = nanoseconds (1 billionth of a second)
+    elapsed_time = (end.tv_sec - start.tv_sec) + 
+                   (end.tv_nsec - start.tv_nsec) / 1000000000.0;
+
+    // %.6f prints the time up to 6 decimal places (microseconds)
+    printf("Elapsed time: %.6f seconds\n", elapsed_time);
+
+
+        std::cout << "Comparisons: " << getComparisonCounter() << std::endl;
 
         // return SUCCESS.
         return SUCCESS;
