@@ -1,6 +1,9 @@
 #include "BPlusTree.h"
 
 #include <cstring>
+#include <bits/stdc++.h>
+
+std::set<int> indsetmap;
 
 RecId BPlusTree::bPlusSearch(int relId, char attrName[ATTR_SIZE], Attribute attrVal, int op) {
     // declare searchIndex which will be used to store search index for attrName.
@@ -76,6 +79,10 @@ RecId BPlusTree::bPlusSearch(int relId, char attrName[ATTR_SIZE], Attribute attr
 
         // load the block into internalBlk using IndInternal::IndInternal().
         IndInternal internalBlk(block);
+        if(indsetmap.find(block) == indsetmap.end()) {
+            incrementBlockAccessCounter();
+            indsetmap.insert(block);
+        }
 
         HeadInfo intHead;
 
@@ -152,6 +159,11 @@ RecId BPlusTree::bPlusSearch(int relId, char attrName[ATTR_SIZE], Attribute attr
         // load the block into leafBlk using IndLeaf::IndLeaf().
         IndLeaf leafBlk(block);
         HeadInfo leafHead;
+        if(indsetmap.find(block) == indsetmap.end()) {
+            incrementBlockAccessCounter();
+            indsetmap.insert(block);
+        }
+
 
         // load the header to leafHead using BlockBuffer::getHeader().
         leafBlk.getHeader(&leafHead);

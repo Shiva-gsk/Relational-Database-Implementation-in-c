@@ -64,6 +64,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
 
     // reset predicate comparison counter for this SELECT command
     resetComparisonCounter();
+    // resetBlockAccessCounter();
 
     // Before calling the search function, reset the search to start from the first hit
     // using RelCacheTable::resetSearchIndex()
@@ -131,6 +132,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
     printf("Elapsed time: %.6f seconds\n", elapsed_time);
 
             std::cout << "Comparisons: " << getComparisonCounter() << std::endl;
+            std::cout << "Block Accesses: " << getBlockAccessCounter() << std::endl;
             return SUCCESS;
         }
     else {
@@ -233,6 +235,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
 
 
         std::cout << "Comparisons: " << getComparisonCounter() << std::endl;
+        std::cout << "Block Accesses: " << getBlockAccessCounter() << std::endl;
 
         // return SUCCESS.
         return SUCCESS;

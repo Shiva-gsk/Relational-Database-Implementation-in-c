@@ -2,8 +2,11 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <bits/stdc++.h>
 
 // the declarations for these functions can be found in "BlockBuffer.h"
+
+std::set<int> setmap;
 
 BlockBuffer::BlockBuffer(int blockNum) {
     // initialise this.blockNum with the argument
@@ -13,7 +16,9 @@ BlockBuffer::BlockBuffer(int blockNum) {
 BlockBuffer::BlockBuffer(char blockType){
     // allocate a block on the disk and a buffer in memory to hold the new block of
     // given type using getFreeBlock function and get the return error codes if any.
-    int blocktype = blockType == 'R' ? REC : UNUSED_BLK;
+    int blocktype = blockType == 'R' ? REC : 
+					blockType == 'I' ? IND_INTERNAL :
+					blockType == 'L' ? IND_LEAF : UNUSED_BLK; 
 
     
     // set the blockNum field of the object to that of the allocated block
@@ -116,12 +121,19 @@ int RecBuffer::getRecord(union Attribute *rec, int slotNum) {
 int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char ** buffPtr) {
     /* check whether the block is already present in the buffer
        using StaticBuffer.getBufferNum() */
+       
     int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
+
+    if(setmap.find(this->blockNum) == setmap.end()) {
+        incrementBlockAccessCounter();
+        setmap.insert(this->blockNum);
+    }
 
     // if present (!=E_BLOCKNOTINBUFFER),
         // set the timestamp of the corresponding buffer to 0 and increment the
         // timestamps of all other occupied buffers in BufferMetaInfo.
     if (bufferNum != E_BLOCKNOTINBUFFER) {
+        
         // set timestamp of bufferNum to 0
         StaticBuffer::metainfo[bufferNum].timeStamp = 0;
         // increment timestamps of all other occupied buffers
@@ -198,9 +210,22 @@ int compareAttrs(union Attribute attr1, union Attribute attr2, int attrType) {
 }
 
 static long long gComparisonCounter = 0;
+static long long blockAccessCounter = 0;
 
 void resetComparisonCounter() {
     gComparisonCounter = 0;
+}
+
+void resetBlockAccessCounter() {
+    blockAccessCounter = 0;
+}
+
+void incrementBlockAccessCounter() {
+    blockAccessCounter++;
+}
+
+long long getBlockAccessCounter() {
+    return blockAccessCounter;
 }
 
 void incrementComparisonCounter() {

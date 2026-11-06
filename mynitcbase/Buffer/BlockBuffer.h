@@ -28,6 +28,10 @@ void resetComparisonCounter();
 void incrementComparisonCounter();
 long long getComparisonCounter();
 
+void resetBlockAccessCounter();
+void incrementBlockAccessCounter();
+long long getBlockAccessCounter();
+
 struct InternalEntry {
   int32_t lChild;
   union Attribute attrVal;
