@@ -13,6 +13,7 @@ struct BufferMetaInfo {
 
 class StaticBuffer {
   friend class BlockBuffer;
+  friend class Algebra;
 
  private:
   // fields
